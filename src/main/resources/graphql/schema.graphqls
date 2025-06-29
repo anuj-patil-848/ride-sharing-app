@@ -1,0 +1,156 @@
+type Query {
+    user(id: ID!): User
+    userByEmail(email: String!): User
+    userByPhoneNumber(phoneNumber: String!): User
+    allUsers: [User!]!
+    activeUsers: [User!]!
+
+    location(id: ID!): Location
+    locationsByCity(city: String!): [Location!]!
+    locationsByPostalCode(postalCode: String!): [Location!]!
+    locationsWithinRadius(latitude: Float!, longitude: Float!, radiusKm: Float!): [Location!]!
+    allLocations: [Location!]!
+
+    ride(id: ID!): Ride
+    ridesByRider(riderId: ID!): [Ride!]!
+    ridesByDriver(driverId: ID!): [Ride!]!
+    ridesByStatus(status: RideStatus!): [Ride!]!
+    ridesNearby(latitude: Float!, longitude: Float!, radiusKm: Float): [Ride!]!
+    similarRides(pickUpLat: Float!, pickUpLon: Float!, pickUpRadiusKm: Float, dropOffLat: Float!, dropOffLon: Float!, dropOffRadiusKm: Float): [Ride!]!
+    potentialRideShares(
+        pickupLatitude: Float!, 
+        pickupLongitude: Float!, 
+        dropoffLatitude: Float!, 
+        dropoffLongitude: Float!, 
+        pickupTime: DateTime!, 
+        pickupRadiusKm: Float!, 
+        dropoffRadiusKm: Float!, 
+        timeWindowMinutes: Int!
+    ): [Ride!]!
+}
+
+type Mutation {
+    createUser(input: CreateUserInput!): User!
+    updateUser(id: ID!, input: UpdateUserInput!): User
+    updateUserRating(id: ID!, rating: Float!): User
+    setUserActiveStatus(id: ID!, active: Boolean!): User
+
+    createLocation(input: CreateLocationInput!): Location!
+    updateLocation(id: ID!, input: UpdateLocationInput!): Location
+
+    createRideRequest(input: CreateRideRequestInput!): Ride!
+    assignDriver(rideId: ID!, driverId: ID!): Ride
+    updateRideStatus(rideId: ID!, status: RideStatus!): Ride
+    cancelRide(rideId: ID!, cancelledBy: CancelledBy!): Ride
+    rateRide(input: RateRideInput!): Ride
+}
+
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    phoneNumber: String!
+    rating: Float
+    active: Boolean!
+    ridesAsRider: [Ride!]
+    ridesAsDriver: [Ride!]
+}
+
+type Location {
+    id: ID!
+    latitude: Float!
+    longitude: Float!
+    address: String!
+    city: String
+    state: String
+    postalCode: String
+    country: String
+}
+
+type Ride {
+    id: ID!
+    rider: User!
+    driver: User
+    pickupLocation: Location!
+    dropoffLocation: Location!
+    status: RideStatus!
+    distance: Float
+    fare: Float
+    requestedPickupTime: DateTime
+    actualPickupTime: DateTime
+    completionTime: DateTime
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    riderRating: Int
+    driverRating: Int
+    riderComments: String
+    driverComments: String
+    parentRide: Ride
+}
+
+input CreateUserInput {
+    name: String!
+    email: String!
+    phoneNumber: String!
+}
+
+input UpdateUserInput {
+    name: String
+    email: String
+    phoneNumber: String
+    active: Boolean
+}
+
+input CreateLocationInput {
+    latitude: Float!
+    longitude: Float!
+    address: String!
+    city: String
+    state: String
+    postalCode: String
+    country: String
+}
+
+input UpdateLocationInput {
+    latitude: Float
+    longitude: Float
+    address: String
+    city: String
+    state: String
+    postalCode: String
+    country: String
+}
+
+input CreateRideRequestInput {
+    riderId: ID!
+    pickupLocationId: ID!
+    dropoffLocationId: ID!
+    requestedPickupTime: DateTime
+}
+
+input RateRideInput {
+    rideId: ID!
+    rating: Int!
+    comments: String
+    isRiderRating: Boolean!
+}
+
+enum RideStatus {
+    REQUESTED
+    ACCEPTED
+    EN_ROUTE_TO_PICKUP
+    ARRIVED_AT_PICKUP
+    IN_PROGRESS
+    COMPLETED
+    CANCELLED_BY_RIDER
+    CANCELLED_BY_DRIVER
+    CANCELLED_BY_SYSTEM
+}
+
+enum CancelledBy {
+    RIDER
+    DRIVER
+    SYSTEM
+}
+
+scalar DateTime

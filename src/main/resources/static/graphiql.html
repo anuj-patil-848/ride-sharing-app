@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GraphiQL IDE</title>
+    <link rel="stylesheet" href="https://unpkg.com/graphiql@1.4.7/graphiql.min.css" />
+    <style>
+        html, body { height: 100%; margin: 0; }
+        #graphiql { height: 100vh; }
+    </style>
+</head>
+<body>
+<div id="graphiql">Loading...</div>
+
+<!-- ✅ Load React & ReactDOM first -->
+<script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+
+<!-- ✅ Then load GraphiQL (1.4.7) -->
+<script src="https://unpkg.com/graphiql@1.4.7/graphiql.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const graphQLFetcher = graphQLParams => {
+            console.log("Sending to /graphql:", graphQLParams);
+            return fetch('http://localhost:8080/graphql', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(graphQLParams),
+            })
+                .then(response => {
+                    console.log("Raw response:", response);
+                    return response.json();
+                })
+                .catch(err => console.error("Fetcher error:", err));
+        };
+
+        ReactDOM.render(
+            React.createElement(GraphiQL, { fetcher: graphQLFetcher }),
+            document.getElementById('graphiql')
+        );
+    });
+</script>
+
+</body>
+</html>
