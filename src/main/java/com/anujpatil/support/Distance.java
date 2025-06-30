@@ -8,7 +8,7 @@ import com.google.maps.model.TravelMode;
 
 public class Distance {
 
-    private static final String API_KEY = "AIzaSyC47e3ErXVFuMYXLZMK4GlXvUNToeFgB2s";
+    private static final String API_KEY = SECRET_API_KEY;
 
     private static final GeoApiContext context = new GeoApiContext.Builder()
             .apiKey(API_KEY)
